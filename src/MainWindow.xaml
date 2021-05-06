@@ -1,0 +1,55 @@
+﻿<Window x:Class="OthelloSharp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OthelloSharp"
+        mc:Ignorable="d"
+        Height="480" Width="853.33"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="White"
+        >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="ControllBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControllBar_MouseLeftButtonDown">
+            <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,12,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
+            <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,12,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
+            <Label x:Name="Title" Content="OthelloSharp" HorizontalAlignment="Left" Margin="32,4,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
+        </Grid>
+        <RichTextBox x:Name="Chat" Grid.Column="1" HorizontalAlignment="Left" Height="367" Margin="218.434,10.151,0,0" Grid.Row="1" VerticalAlignment="Top" Width="198" IsReadOnly="True" Style="{x:Null}" FontSize="12">
+            <FlowDocument/>
+        </RichTextBox>
+        <TextBox x:Name="ChatInput" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="218.434,382.151,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="198"/>
+        <Grid x:Name="Menu" HorizontalAlignment="Left" Height="440" Margin="0,0.151,0,0" Grid.Row="1" VerticalAlignment="Top" Width="200" Background="#FFEBEBF5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="47*"/>
+                <ColumnDefinition Width="53*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="57*"/>
+                <RowDefinition Height="383*"/>
+            </Grid.RowDefinitions>
+            <StackPanel x:Name="MenuLabelPanel" HorizontalAlignment="Left" Height="382" Margin="10,26,0,0" VerticalAlignment="Top" Width="180" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                <Label x:Name="HostGameLabel" Content="게임 생성" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.226,0" Height="64" Width="110"/>
+                <Label x:Name="JoinGameLabel" Content="게임 참여" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.226,0" Height="64" Width="110"/>
+                <Label x:Name="HelpLabel" Content="게임 설명" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.226,0" Height="48" Width="110"/>
+            </StackPanel>
+            <Image x:Name="HostIcon" HorizontalAlignment="Left" Height="18" Margin="36,33,0,0" VerticalAlignment="Top" Width="18" Source="/OthelloSharp;component/assets/host.png"/>
+            <Image x:Name="ClientIcon" HorizontalAlignment="Left" Height="18" Margin="36,39.943,0,0" VerticalAlignment="Top" Width="18" Source="/OthelloSharp;component/assets/client.png" Grid.Row="1"/>
+            <Image x:Name="HelpIcon" HorizontalAlignment="Left" Height="18" Margin="36,0,0,261.151" VerticalAlignment="Bottom" Width="18" Source="/OthelloSharp;component/assets/help.png" Grid.Row="1" RenderTransformOrigin="0.396,1.745"/>
+            <StackPanel x:Name="MenuEmpPanel" HorizontalAlignment="Left" Height="394" Margin="10,11,0,0" VerticalAlignment="Top" Width="180" Grid.RowSpan="2" Grid.ColumnSpan="2" Opacity="0.2">
+                <Rectangle x:Name="MenuEmp1" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuEmp_MouseEnter" MouseLeave="MenuEmp_MouseLeave"/>
+                <Rectangle x:Name="MenuEmp2" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuEmp_MouseEnter" MouseLeave="MenuEmp_MouseLeave"/>
+                <Rectangle x:Name="MenuEmp3" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuEmp_MouseEnter" MouseLeave="MenuEmp_MouseLeave"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
