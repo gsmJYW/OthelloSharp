@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OthelloSharp"
         mc:Ignorable="d"
-        Height="480" Width="853.33"
+        Height="480" Width="853.33333"
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="White"
         >
-    <Grid>
+    <Grid Height="480" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
@@ -24,10 +24,10 @@
             <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,12,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
             <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,4,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
         </Grid>
-        <RichTextBox x:Name="Chat" Grid.Column="1" HorizontalAlignment="Left" Height="362" Margin="213,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="203" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
+        <RichTextBox x:Name="ChatTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="364" Margin="215,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="201" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
             <FlowDocument/>
         </RichTextBox>
-        <TextBox x:Name="ChatInput" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="213,382,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="203" IsEnabled="False"/>
+        <TextBox x:Name="ChatInputTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="215,384,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="201" IsEnabled="False" KeyDown="ChatInputTextBox_KeyDown"/>
         <Grid x:Name="Menu" HorizontalAlignment="Left" Height="442" Grid.Row="1" VerticalAlignment="Top" Width="200" Background="#FFEBEBF5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="47*"/>
@@ -45,11 +45,11 @@
                 <Label x:Name="LabelMargin" Content="" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0,0" Height="182" Width="110"/>
                 <Label x:Name="CancelLabel" Content="연결 취소" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.113,0" Height="48" Width="110" Opacity="0.5"/>
             </StackPanel>
-            <StackPanel x:Name="MenuButtonPanel" HorizontalAlignment="Left" Height="421" Margin="10,11,0,0" VerticalAlignment="Top" Width="180" Grid.RowSpan="3" Grid.ColumnSpan="2" Opacity="0.2">
+            <StackPanel x:Name="MenuButtonPanel" HorizontalAlignment="Left" Height="422" Margin="10,10,0,0" VerticalAlignment="Top" Width="180" Grid.RowSpan="3" Grid.ColumnSpan="2" Opacity="0.2">
                 <Rectangle x:Name="ServerButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" MouseLeftButtonDown="ServerButton_MouseLeftButtonDown"/>
                 <Rectangle x:Name="ClientButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" MouseLeftButtonDown="ClientButton_MouseLeftButtonDown"/>
                 <Rectangle x:Name="HelpButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" MouseLeftButtonDown="HelpButton_MouseLeftButtonDown"/>
-                <Rectangle x:Name="ButtonMargin" Fill="Black" Height="165" Stroke="Black" Opacity="0"/>
+                <Rectangle x:Name="ButtonMargin" Fill="Black" Height="166" Stroke="Black" Opacity="0"/>
                 <Rectangle x:Name="CancelButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" IsEnabled="False" MouseLeftButtonDown="CancelButton_MouseLeftButtonDown"/>
             </StackPanel>
         </Grid>
@@ -59,8 +59,34 @@
             <Image x:Name="HelpIcon" Source="/OthelloSharp;component/assets/help.png" Margin="26,149,26,249" RenderTransformOrigin="1.6,4.65"/>
             <Image x:Name="CancelIcon" Source="/OthelloSharp;component/assets/cancel.png" Margin="26,379,26,19" RenderTransformOrigin="1.6,4.65" Opacity="0.5"/>
         </Grid>
-        <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="420" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="420" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
-            <FlowDocument/>
+        <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="422" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="422" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
+            <FlowDocument>
+                <Paragraph/>
+            </FlowDocument>
         </RichTextBox>
+        <Border x:Name="BoardBorder" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="422" VerticalAlignment="Top" Width="422" RenderTransformOrigin="0.865,0.744" Margin="210,10,0,0" Grid.Row="1" Grid.ColumnSpan="2" d:IsHidden="True">
+            <Grid x:Name="BoardGrid" Background="#FF00A000" ShowGridLines="True" Margin="0,0,0,0" MouseLeftButtonDown="BoardGrid_MouseLeftButtonDown">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                    <ColumnDefinition Width="52"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
