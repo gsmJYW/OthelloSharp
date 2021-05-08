@@ -52,10 +52,10 @@ namespace OthelloSharp
 			ServerSocket.Close();
 		}
 
-		public void SendMessage(string message)
+		public void Send(string format, params object[] args)
 		{
 			AsyncObject ao = new AsyncObject(1);
-			ao.Buffer = Encoding.Unicode.GetBytes(message);
+			ao.Buffer = Encoding.Unicode.GetBytes(string.Format(format, args));
 			ao.WorkingSocket = ConnectedClient;
 
 			ConnectedClient.BeginSend(ao.Buffer, 0, ao.Buffer.Length, SocketFlags.None, SendHandler, ao);
@@ -100,7 +100,7 @@ namespace OthelloSharp
 			{
 				byte[] msgByte = new byte[recvBytes];
 				Array.Copy(ao.Buffer, msgByte, recvBytes);
-				MessageBox.Show(Encoding.Unicode.GetString(msgByte));
+				mainWindow.Recieved(Encoding.Unicode.GetString(msgByte));
 			}
 
 			ao.WorkingSocket.BeginReceive(ao.Buffer, 0, ao.Buffer.Length, SocketFlags.None, ReceiveHandler, ao);
@@ -114,7 +114,7 @@ namespace OthelloSharp
 			{
 				byte[] msgByte = new byte[sentBytes];
 				Array.Copy(ao.Buffer, msgByte, sentBytes);
-				MessageBox.Show(Encoding.Unicode.GetString(msgByte));
+				mainWindow.Sent(Encoding.Unicode.GetString(msgByte));
 			}
 		}
 	}

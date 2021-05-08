@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
 
@@ -22,7 +24,17 @@ namespace OthelloSharp
         {
             DragMove();
         }
-        
+
+        private void MinimizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Close();
+        }
+
         private void MenuButton_MouseEnter(object sender, MouseEventArgs e)
         {
             ((Rectangle)sender).Opacity = 1;
@@ -31,16 +43,6 @@ namespace OthelloSharp
         private void MenuButton_MouseLeave(object sender, MouseEventArgs e)
         {
             ((Rectangle)sender).Opacity = 0;
-        }
-
-        private void CloseButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Close();
-        }
-
-        private void MinimizeButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
         }
 
         private void ServerButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -130,7 +132,7 @@ namespace OthelloSharp
 
         private void CancelButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ConsoleWriteLine("연결 취소.");
+            TextBoxWriteLine(ConsoleTextBox, "연결 취소.");
             DisableCancelButton();
 
             if (CreateGameThread != null && CreateGameThread.IsAlive)
@@ -152,7 +154,7 @@ namespace OthelloSharp
         {
             Server = new Server(this);
 
-            ConsoleWriteLine(port + " 포트에서 게임 생성 중...");
+            TextBoxWriteLine(ConsoleTextBox, "{0} 포트에서 게임 생성 중...", port);
             EnableCancelButton();
 
             try
@@ -161,12 +163,12 @@ namespace OthelloSharp
             }
             catch
             {
-                ConsoleWriteLine("게임 생성 실패");
+                TextBoxWriteLine(ConsoleTextBox, "게임 생성 실패");
                 DisableCancelButton();
                 return;
             }
 
-            ConsoleWriteLine("게임 생성 성공, 연결을 기다리는 중...");
+            TextBoxWriteLine(ConsoleTextBox, "게임 생성 성공, 연결을 기다리는 중...");
 
             while (true)
             {
@@ -175,7 +177,7 @@ namespace OthelloSharp
                     if (Server.IsClientConnected())
                     {
                         DisableCancelButton();
-                        ConsoleWriteLine("연결 완료.");
+                        Connected();
                         break;
                     }
                 }
@@ -186,24 +188,26 @@ namespace OthelloSharp
             }
         }
 
-        private void JoinGame(string server, ushort port)
+        private void JoinGame(string serverAddress, ushort port)
         {
             Client = new Client(this);
 
-            ConsoleWriteLine("연결을 시도하는 중...");
+            TextBoxWriteLine(ConsoleTextBox, "{0}:{1}(으)로 연결을 시도하는 중...", serverAddress, port);
             EnableCancelButton();
 
             try
             {
-                Client.Connect(server, port);
-                ConsoleWriteLine("연결 완료.");
+                Client.Connect(serverAddress, port);
+                Connected();
             }
-            catch
+            catch (Exception e)
             {
+                MessageBox.Show(e.Message);
+
                 try
                 {
                     Client.IsServerConnected();
-                    ConsoleWriteLine("연결 실패.");
+                    TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
                 }
                 catch
                 {
@@ -215,36 +219,104 @@ namespace OthelloSharp
 
         private void EnableCancelButton()
         {
-            Dispatcher.Invoke(new Action(() => {
+            Dispatcher.Invoke(new Action(() =>
+            {
                 CancelButton.IsEnabled = true;
                 CancelIcon.Opacity = 1;
                 CancelLabel.Opacity = 1;
-                })
-            );
+            }));
         }
 
         private void DisableCancelButton()
         {
-            Dispatcher.Invoke(new Action(() => {
+            Dispatcher.Invoke(new Action(() =>
+            {
                 CancelButton.IsEnabled = false;
                 CancelIcon.Opacity = .5;
                 CancelLabel.Opacity = .5;
-                })
-            );
+            }));
         }
 
-        private void ConsoleWriteLine(string text)
+        private void TextBoxWriteLine(RichTextBox richTextbox, string format, params object[] args)
         {
-            Dispatcher.Invoke(new Action(() => {
-                ConsoleTextBox.AppendText(text);
-                ConsoleTextBox.AppendText(Environment.NewLine);
-                ConsoleTextBox.ScrollToEnd();
-                })
-            );
+            Dispatcher.Invoke(new Action(() =>
+            {
+                richTextbox.AppendText(string.Format(format, args));
+                richTextbox.AppendText(Environment.NewLine);
+                richTextbox.ScrollToEnd();
+            }));
+        }
+
+        public void Send(string format, params object[] args)
+        {
+            if (Server != null)
+            {
+                Server.Send(format, args);
+            }
+            else if (Client != null)
+            {
+                Client.Send(format, args);
+            }
+        }
+
+        public void Recieved(string msg)
+        {
+            string[] msgSplit = msg.Split();
+            string request = msgSplit[0];
+
+            switch (request)
+            {
+                case "chat":
+                    string content = string.Join("", msgSplit.Skip(1).ToArray());
+                    TextBoxWriteLine(ChatTextBox, "<상대> {0}", content);
+                    break;
+            }
+        }
+
+        public void Sent(string msg)
+        {
+            string[] msgSplit = msg.Split();
+            string request = msgSplit[0];
+
+            switch (request)
+            {
+                case "chat":
+                    string content = string.Join("", msgSplit.Skip(1).ToArray());
+                    TextBoxWriteLine(ChatTextBox, "<나> {0}", content);
+                    break;
+            }
+        }
+
+        private void ChatInputTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (ChatInputTextBox.Text.Length > 0 && e.Key == Key.Return)
+            {
+                Send("chat {0}", ChatInputTextBox.Text);
+                ChatInputTextBox.Clear();
+            }
+        }
+
+        private void Connected()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ConsoleTextBox.Document.Blocks.Clear();
+                ChatTextBox.IsEnabled = true;
+                ChatInputTextBox.IsEnabled = true;
+            }));
         }
 
         public void Disconnected()
         {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ChatTextBox.IsEnabled = false;
+                ChatInputTextBox.IsEnabled = false;
+
+                ChatTextBox.Document.Blocks.Clear();
+                ChatInputTextBox.Clear();
+            }));
+
             if (Server != null)
             {
                 Server.Close();
@@ -255,7 +327,6 @@ namespace OthelloSharp
                 Client.Close();
                 Client = null;
             }
-
             MessageBox.Show("연결이 끊겼습니다", "알림");
         }
     }
