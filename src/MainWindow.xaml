@@ -24,10 +24,10 @@
             <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,12,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
             <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,4,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
         </Grid>
-        <RichTextBox x:Name="Chat" Grid.Column="1" HorizontalAlignment="Left" Height="362" Margin="218,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="198" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
+        <RichTextBox x:Name="Chat" Grid.Column="1" HorizontalAlignment="Left" Height="362" Margin="213,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="203" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
             <FlowDocument/>
         </RichTextBox>
-        <TextBox x:Name="ChatInput" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="218.434,382.151,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="198" IsEnabled="False"/>
+        <TextBox x:Name="ChatInput" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="213,382,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="203" IsEnabled="False"/>
         <Grid x:Name="Menu" HorizontalAlignment="Left" Height="442" Grid.Row="1" VerticalAlignment="Top" Width="200" Background="#FFEBEBF5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="47*"/>
@@ -59,7 +59,7 @@
             <Image x:Name="HelpIcon" Source="/OthelloSharp;component/assets/help.png" Margin="26,149,26,249" RenderTransformOrigin="1.6,4.65"/>
             <Image x:Name="CancelIcon" Source="/OthelloSharp;component/assets/cancel.png" Margin="26,379,26,19" RenderTransformOrigin="1.6,4.65" Opacity="0.5"/>
         </Grid>
-        <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="420" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="425" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
+        <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="420" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="420" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
             <FlowDocument/>
         </RichTextBox>
     </Grid>
