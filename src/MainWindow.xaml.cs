@@ -121,8 +121,8 @@ namespace OthelloSharp
         private void HelpButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MessageBox.Show(
-                "키보드 방향키로 보드판의 커서를 이동시킬 수 있습니다.\n" +
-                "엔터를 입력하면 커서가 있는 위치에 돌을 놓습니다.\n" +
+                "9x9 보드판에 마우스 클릭으로 돌을 두는 방식으로 진행됩니다.\n" +
+                "각자 5분의 시간이 주어지며 시간을 다 쓰는 상대는 패배합니다.\n" +
                 "만약 돌을 놓을 수 있는 곳이 없다면 자동으로 턴이 넘겨집니다.\n" +
                 "흑이 선공, 백이 후공이며 흑백 지정은 랜덤입니다.\n" +
                 "이 외의 룰은 보드게임 오델로와 같습니다.\n",
@@ -278,6 +278,7 @@ namespace OthelloSharp
             string[] msgSplit = msg.Split();
             string request = msgSplit[0];
 
+
             switch (request)
             {
                 case "chat":
@@ -286,7 +287,6 @@ namespace OthelloSharp
                     break;
             }
         }
-
         private void ChatInputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (ChatInputTextBox.Text.Length > 0 && e.Key == Key.Return)
