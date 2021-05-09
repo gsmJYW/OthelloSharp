@@ -102,9 +102,9 @@
                 <Label x:Name="MyColorLabel" Content="색" HorizontalAlignment="Left" Margin="26,10,0,386" Width="24" RenderTransformOrigin="0.833,1"/>
                 <Rectangle x:Name="MyColorRectangle" Fill="White" HorizontalAlignment="Left" Height="20" Margin="65,14,0,0" Stroke="Black" VerticalAlignment="Top" Width="48"/>
                 <Label x:Name="MyPieceLabel" Content="돌" HorizontalAlignment="Left" Margin="26,36,0,360" Width="24" RenderTransformOrigin="0.833,1"/>
-                <Label x:Name="MyPieceCountLabel" Content="66" HorizontalAlignment="Left" Margin="62,36,0,360" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="MyPieceCountLabel" Content="02" HorizontalAlignment="Left" Margin="62,36,0,360" Width="24" RenderTransformOrigin="0.833,1"/>
                 <Label x:Name="MyTimeLabel" Content="시간" HorizontalAlignment="Left" Margin="26,62,0,334" Width="36" RenderTransformOrigin="0.833,1"/>
-                <Label x:Name="MyTimeSecondLabel" Content="666.6초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="MyTimeSecondLabel" Content="300.0초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
             </Grid>
             <Grid x:Name="OpponentResult" HorizontalAlignment="Left" Height="311" VerticalAlignment="Top" Width="190" Margin="0,72,0,0" Grid.Row="1">
                 <Grid.ColumnDefinitions>
@@ -115,9 +115,9 @@
                 <Label x:Name="OpponentColorLabel" Content="색" HorizontalAlignment="Left" Margin="26,10,0,277" Width="24" RenderTransformOrigin="0.833,1"/>
                 <Rectangle x:Name="OpponentColorRectangle" Fill="White" HorizontalAlignment="Left" Height="20" Margin="65,14,0,0" Stroke="Black" VerticalAlignment="Top" Width="48"/>
                 <Label x:Name="OpponentPieceLabel" Content="돌" HorizontalAlignment="Left" Margin="26,36,0,251" Width="24" RenderTransformOrigin="0.833,1"/>
-                <Label x:Name="OpponentPieceCountLabel" Content="66" HorizontalAlignment="Left" Margin="62,36,0,249" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="OpponentPieceCountLabel" Content="02" HorizontalAlignment="Left" Margin="62,36,0,249" Width="24" RenderTransformOrigin="0.833,1"/>
                 <Label x:Name="OpponentTimeLabel" Content="시간" HorizontalAlignment="Left" Margin="26,62,0,225" Width="36" RenderTransformOrigin="0.833,1"/>
-                <Label x:Name="OpponentTimeSecondLabel" Content="666.6초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="OpponentTimeSecondLabel" Content="300.0초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
             </Grid>
         </Grid>
     </Grid>

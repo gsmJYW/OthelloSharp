@@ -138,7 +138,6 @@ namespace OthelloSharp
         private void CancelButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TextBoxWriteLine(ConsoleTextBox, "연결 취소.");
-            DisableCancelButton();
 
             if (CreateGameThread != null && CreateGameThread.IsAlive)
             {
@@ -166,9 +165,11 @@ namespace OthelloSharp
             {
                 Server.Open(port);
             }
-            catch (Exception e)
+            catch
             {
-                TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
+                Server = null;
+
+                TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
                 DisableCancelButton();
                 return;
             }
@@ -181,7 +182,6 @@ namespace OthelloSharp
                 {
                     if (Server.IsClientConnected())
                     {
-                        DisableCancelButton();
                         Connected();
                         break;
                     }
@@ -203,21 +203,14 @@ namespace OthelloSharp
             try
             {
                 Client.Connect(serverAddress, port);
-                Connected();
             }
             catch (Exception e)
             {
-                try
-                {
-                    Client.IsServerConnected();
-                    TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
-                }
-                catch
-                {
-
-                }
+                TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
+                DisableCancelButton();
+                return;
             }
-            DisableCancelButton();
+            Connected();
         }
 
         private void EnableCancelButton()
@@ -256,7 +249,7 @@ namespace OthelloSharp
             }));
         }
 
-        private void TextBoxWriteLine(RichTextBox richTextbox, string format, params object[] args)
+        public void TextBoxWriteLine(RichTextBox richTextbox, string format, params object[] args)
         {
             Dispatcher.Invoke(new Action(() =>
             {
@@ -404,10 +397,10 @@ namespace OthelloSharp
 
         public void Connected()
         {
+            DisableCancelButton();
+
             Dispatcher.Invoke(new Action(() =>
             {
-                ConsoleTextBox.Document.Blocks.Clear();
-
                 ChatTextBox.IsEnabled = true;
                 ChatInputTextBox.IsEnabled = true;
             }));
@@ -428,8 +421,23 @@ namespace OthelloSharp
 
             while (game.myPiece == 0 || game.opponentPiece == 0)
             {
+                if (Server != null && !Server.IsClientConnected() || Client != null && !Client.IsServerConnected())
+                {
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        ChatTextBox.IsEnabled = false;
+                        ChatInputTextBox.IsEnabled = false;
+                    }));
 
+                    TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
+                    return;
+                }
             }
+
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ConsoleTextBox.Document.Blocks.Clear();
+            }));
 
             TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", PieceName(game.myPiece));
             TextBoxWriteLine(ConsoleTextBox, "{0} 차례로 시작합니다.", PlayerName(Piece.Black));
@@ -438,6 +446,11 @@ namespace OthelloSharp
             {
                 TextBoxWriteLine(ConsoleTextBox, sec.ToString());
                 Thread.Sleep(1000);
+
+                if (Server == null && Client == null)
+                {
+                    return;
+                }
             }
 
             Dispatcher.Invoke(new Action(() =>
@@ -500,6 +513,8 @@ namespace OthelloSharp
 
         public void Disconnected()
         {
+            EnableCancelButton();
+
             Dispatcher.Invoke(new Action(() =>
             {
                 ChatTextBox.IsEnabled = false;
@@ -507,8 +522,6 @@ namespace OthelloSharp
 
                 ChatTextBox.Document.Blocks.Clear();
                 ChatInputTextBox.Clear();
-
-                ConsoleTextBox.Document.Blocks.Clear();
 
                 Menu.Visibility = Visibility.Visible;
                 Result.Visibility = Visibility.Hidden;

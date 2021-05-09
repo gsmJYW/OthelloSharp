@@ -72,10 +72,10 @@ namespace OthelloSharp
 				recvBytes = ao.WorkingSocket.EndReceive(ar);
 			}
 			catch
-            {
+			{
 				mainWindow.Disconnected();
 				return;
-            }
+			}
 
 			if (recvBytes > 0)
 			{
