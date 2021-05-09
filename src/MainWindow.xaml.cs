@@ -20,6 +20,8 @@ namespace OthelloSharp
         Server Server;
         Client Client;
 
+        bool IsPiecePlaced;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -234,8 +236,7 @@ namespace OthelloSharp
                     break;
 
                 case "piece":
-                    game.myPiece = Convert.ToInt32(msgSplit[1]);
-                    game.opponentPiece = InvertPiece(game.myPiece);
+                    game.SetPiece(Convert.ToInt32(msgSplit[1]));
                     break;
             }
         }
@@ -253,8 +254,13 @@ namespace OthelloSharp
                     break;
 
                 case "piece":
-                    game.myPiece = Convert.ToInt32(msgSplit[2]);
-                    game.opponentPiece = InvertPiece(game.myPiece);
+                    game.SetPiece(Convert.ToInt32(msgSplit[2]));
+                    break;
+
+                case "place":
+                    game.PlacePiece(game.opponentPiece, Convert.ToInt32(msgSplit[1]), Convert.ToInt32(msgSplit[2]));
+                    game.opponentTime = Convert.ToDouble(msgSplit[3]);
+                    IsPiecePlaced = true;
                     break;
             }
         }
@@ -270,6 +276,11 @@ namespace OthelloSharp
 
         private void BoardGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (game.turn != game.myPiece)
+            {
+                return;
+            }
+
             var point = Mouse.GetPosition(BoardGrid);
 
             int row = 0;
@@ -300,6 +311,14 @@ namespace OthelloSharp
                 }
 
                 col++;
+            }
+
+            if (game.IsAvailable(game.myPiece, row, col))
+            {
+                game.PlacePiece(game.myPiece, row, col);
+                Send("place {0} {1} {2}", row, col, game.myTime);
+
+                IsPiecePlaced = true;
             }
         }
 
@@ -347,10 +366,21 @@ namespace OthelloSharp
 
         public void Connected()
         {
-            DisableCancelButton();
-
             Dispatcher.Invoke(new Action(() =>
             {
+                ServerButton.IsEnabled = true;
+                ClientButton.IsEnabled = true;
+
+                ServerIcon.Opacity = 1;
+                ClientIcon.Opacity = 1;
+
+                ServerLabel.Opacity = 1;
+                ClientLabel.Opacity = 1;
+
+                MenuButtonPanel.IsEnabled = false;
+                MenuLabelPanel.Opacity = .5;
+                MenuIcon.Opacity = .5;
+
                 ChatTextBox.IsEnabled = true;
                 ChatInputTextBox.IsEnabled = true;
             }));
@@ -403,6 +433,10 @@ namespace OthelloSharp
                 Menu.Visibility = Visibility.Hidden;
                 Result.Visibility = Visibility.Visible;
                 BoardCanvas.Visibility = Visibility.Visible;
+                
+                MenuButtonPanel.IsEnabled = true;
+                MenuLabelPanel.Opacity = 1;
+                MenuIcon.Opacity = 1;
 
                 if (game.myPiece == Piece.Black)
                 {
@@ -435,7 +469,7 @@ namespace OthelloSharp
                 double myStartTime = game.myTime;
                 double opponentStartTime = game.opponentTime;
 
-                while (true)
+                while (!IsPiecePlaced)
                 {
                     double ellapsedSecs = DateTime.Now.Subtract(startTime).TotalSeconds;
 
@@ -450,6 +484,18 @@ namespace OthelloSharp
 
                     UpdateTimeLabel();
                     Thread.Sleep(100);
+                }
+
+                DrawPiece(game.board);
+                IsPiecePlaced = false;
+
+                if (game.turn == game.myPiece)
+                {
+                    game.turn = game.opponentPiece;
+                }
+                else
+                {
+                    game.turn = game.myPiece;
                 }
             }
         }

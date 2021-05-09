@@ -19,16 +19,7 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="ControlBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControlBar_MouseLeftButtonDown" Height="36" VerticalAlignment="Top">
-            <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,10,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
-            <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,10,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
-            <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,2,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
-        </Grid>
-        <RichTextBox x:Name="ChatTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="364" Margin="215,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="201" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
-            <FlowDocument/>
-        </RichTextBox>
-        <TextBox x:Name="ChatInputTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="215,384,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="201" IsEnabled="False" KeyDown="ChatInputTextBox_KeyDown"/>
-        <Grid x:Name="Menu" HorizontalAlignment="Left" Height="442" Grid.Row="1" VerticalAlignment="Top" Width="200" Background="#FFEBEBF5">
+        <Grid x:Name="Menu" HorizontalAlignment="Left" Width="200" Background="#FFEBEBF5" Margin="0,36,0,0" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="47*"/>
                 <ColumnDefinition Width="53*"/>
@@ -59,6 +50,15 @@
                 <Rectangle x:Name="CancelButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" IsEnabled="False" MouseLeftButtonDown="CancelButton_MouseLeftButtonDown"/>
             </StackPanel>
         </Grid>
+        <Grid x:Name="ControlBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControlBar_MouseLeftButtonDown" Height="36" VerticalAlignment="Top">
+            <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,10,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
+            <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,10,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
+            <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,2,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
+        </Grid>
+        <RichTextBox x:Name="ChatTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="364" Margin="215,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="201" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
+            <FlowDocument/>
+        </RichTextBox>
+        <TextBox x:Name="ChatInputTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="48" Margin="215,384,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="201" IsEnabled="False" KeyDown="ChatInputTextBox_KeyDown"/>
         <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="422" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="422" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
             <FlowDocument>
                 <Paragraph/>
