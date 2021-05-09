@@ -64,8 +64,9 @@
                 <Paragraph/>
             </FlowDocument>
         </RichTextBox>
-        <Border x:Name="BoardBorder" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="422" VerticalAlignment="Top" Width="422" RenderTransformOrigin="0.865,0.744" Margin="210,10,0,0" Grid.Row="1" Grid.ColumnSpan="2" d:IsHidden="True">
-            <Grid x:Name="BoardGrid" Background="#FF00A000" ShowGridLines="True" Margin="0,0,0,0" MouseLeftButtonDown="BoardGrid_MouseLeftButtonDown">
+        <Border x:Name="BoardBorder" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="422" VerticalAlignment="Top" Width="422" RenderTransformOrigin="0.865,0.744" Margin="210,10,0,0" Grid.Row="1" Grid.ColumnSpan="2" d:IsHidden="True"/>
+        <Canvas x:Name="BoardCanvas" HorizontalAlignment="Left" Height="422" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="422" Grid.ColumnSpan="2" Background="Black" Visibility="Hidden">
+            <Grid x:Name="BoardGrid" Background="#FF00A000" ShowGridLines="True" MouseLeftButtonDown="BoardGrid_MouseLeftButtonDown" Height="416" Canvas.Left="3" Canvas.Top="3" Width="416">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
@@ -87,6 +88,6 @@
                     <ColumnDefinition Width="52"/>
                 </Grid.ColumnDefinitions>
             </Grid>
-        </Border>
+        </Canvas>
     </Grid>
 </Window>

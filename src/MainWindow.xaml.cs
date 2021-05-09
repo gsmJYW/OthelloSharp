@@ -5,12 +5,20 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace OthelloSharp
 {
     public partial class MainWindow : Window
     {
+        static class Constants
+        {
+            public const int Empty = 0;
+            public const int White = 1;
+            public const int Black = 2;
+        }
+
         Thread CreateGameThread, JoinGameThread;
         Server Server;
         Client Client;
@@ -333,20 +341,50 @@ namespace OthelloSharp
             foreach (var rowDefinition in BoardGrid.RowDefinitions)
             {
                 accumulatedHeight += rowDefinition.ActualHeight;
+                
                 if (accumulatedHeight >= point.Y)
+                {
                     break;
+                }
+
                 row++;
             }
 
             foreach (var columnDefinition in BoardGrid.ColumnDefinitions)
             {
                 accumulatedWidth += columnDefinition.ActualWidth;
+
                 if (accumulatedWidth >= point.X)
+                {
                     break;
+                }
+
                 col++;
             }
+        }
 
-            MessageBox.Show(string.Format("{0}, {1}", row, col));
+        public void DrawPiece(int row, int col, int color)
+        {
+            var piece = new Ellipse()
+            {
+                Height = 43,
+                Width = 43,
+                StrokeThickness = 3,
+                Margin = new Thickness() { Top = 7 + 52 * row, Left = 7 + 52 * col }
+            };
+
+            if (color == Constants.White)
+            {
+                piece.Fill = Brushes.White;
+                piece.Stroke = Brushes.Black;
+            }
+            else
+            {
+                piece.Fill = Brushes.Black;
+                piece.Stroke = Brushes.White;
+            }
+
+            BoardCanvas.Children.Add(piece);
         }
 
         public void Disconnected()
