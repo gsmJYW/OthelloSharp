@@ -20,8 +20,8 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid x:Name="ControlBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControlBar_MouseLeftButtonDown" Height="36" VerticalAlignment="Top">
-            <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,12,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
-            <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,12,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
+            <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,10,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
+            <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,10,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
             <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,2,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
         </Grid>
         <RichTextBox x:Name="ChatTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="364" Margin="215,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="201" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">

@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using OthelloSharp.src;
 using System;
 using System.Linq;
 using System.Threading;
@@ -7,20 +8,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using static OthelloSharp.src.Game;
 
 namespace OthelloSharp
 {
     public partial class MainWindow : Window
     {
-        static class Piece
-        {
-            public const int Empty = 0;
-            public const int Black = 1;
-            public const int White = 2;
-        }
-
-        int MyPiece = 0;
-        int OpponentPiece = 0;
+        Game game;
 
         Thread CreateGameThread, JoinGameThread;
         Server Server;
@@ -289,7 +283,6 @@ namespace OthelloSharp
             string[] msgSplit = msg.Split();
             string request = msgSplit[0];
 
-
             switch (request)
             {
                 case "chat":
@@ -298,8 +291,8 @@ namespace OthelloSharp
                     break;
 
                 case "piece":
-                    MyPiece = Convert.ToInt32(msgSplit[1]);
-                    OpponentPiece = InvertPiece(MyPiece);
+                    game.myPiece = Convert.ToInt32(msgSplit[1]);
+                    game.opponentPiece = InvertPiece(game.myPiece);
                     break;
             }
         }
@@ -317,8 +310,8 @@ namespace OthelloSharp
                     break;
 
                 case "piece":
-                    MyPiece = Convert.ToInt32(msgSplit[2]);
-                    OpponentPiece = InvertPiece(MyPiece);
+                    game.myPiece = Convert.ToInt32(msgSplit[2]);
+                    game.opponentPiece = InvertPiece(game.myPiece);
                     break;
             }
         }
@@ -367,28 +360,46 @@ namespace OthelloSharp
             }
         }
 
-        public void DrawPiece(int row, int col, int piece)
+        public void DrawPiece(int[,] board)
         {
-            var pieceEllipse = new Ellipse()
+            for (int row = 0; row < board.GetLength(0); row++)
             {
-                Height = 43,
-                Width = 43,
-                StrokeThickness = 3,
-                Margin = new Thickness() { Top = 7 + 52 * row, Left = 7 + 52 * col }
-            };
+                for (int col = 0; col < board.GetLength(1); col++)
+                {
+                    if (board[row, col] != Piece.Empty)
+                    {
+                        Dispatcher.Invoke(new Action(() =>
+                        {
+                            var pieceEllipse = new Ellipse()
+                            {
+                                Height = 43,
+                                Width = 43,
+                                Margin = new Thickness() { Top = 7 + 52 * row, Left = 7 + 52 * col }
+                            };
 
-            if (piece == Piece.Black)
-            {
-                pieceEllipse.Fill = Brushes.Black;
-                pieceEllipse.Stroke = Brushes.White;
-            }
-            else
-            {
-                pieceEllipse.Fill = Brushes.White;
-                pieceEllipse.Stroke = Brushes.Black;
-            }
+                            if (board[row, col] == Piece.Black)
+                            {
+                                pieceEllipse.Fill = Brushes.Black;
+                            }
+                            else
+                            {
+                                pieceEllipse.Fill = Brushes.White;
+                            }
 
-            BoardCanvas.Children.Add(pieceEllipse);
+                            BoardCanvas.Children.Add(pieceEllipse);
+                        }));
+                    }
+                }
+            }
+        }
+
+        public void UpdateTimeLabel()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                MyTimeSecondLabel.Content = string.Format("{0:000.0}", game.myTime);
+                OpponentTimeSecondLabel.Content = string.Format("{0:000.0}", game.opponentTime);
+            }));
         }
 
         public void Connected()
@@ -400,6 +411,8 @@ namespace OthelloSharp
                 ChatTextBox.IsEnabled = true;
                 ChatInputTextBox.IsEnabled = true;
             }));
+
+            game = new Game();
 
             if (Server != null)
             {
@@ -413,15 +426,15 @@ namespace OthelloSharp
                 }
             }
 
-            while (MyPiece == 0 || OpponentPiece == 0)
+            while (game.myPiece == 0 || game.opponentPiece == 0)
             {
 
             }
 
-            TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", PieceName(MyPiece));
+            TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", PieceName(game.myPiece));
             TextBoxWriteLine(ConsoleTextBox, "{0} 차례로 시작합니다.", PlayerName(Piece.Black));
 
-            for (int sec = 5; sec > 0; sec--)
+            for (int sec = 4; sec > 0; sec--)
             {
                 TextBoxWriteLine(ConsoleTextBox, sec.ToString());
                 Thread.Sleep(1000);
@@ -435,7 +448,7 @@ namespace OthelloSharp
                 Result.Visibility = Visibility.Visible;
                 BoardCanvas.Visibility = Visibility.Visible;
 
-                if (MyPiece == Piece.Black)
+                if (game.myPiece == Piece.Black)
                 {
                     OpponentColorRectangle.Fill = Brushes.White;
                     OpponentColorRectangle.Stroke = Brushes.Black;
@@ -450,6 +463,39 @@ namespace OthelloSharp
                     OpponentColorRectangle.Fill = Brushes.Black;
                 }
             }));
+
+            game.InitBoard();
+            DrawPiece(game.board);
+
+            game.myTime = 300;
+            game.opponentTime = 300;
+
+            game.turn = Piece.Black;
+
+            while (true)
+            {
+                DateTime startTime = DateTime.Now;
+
+                double myStartTime = game.myTime;
+                double opponentStartTime = game.opponentTime;
+
+                while (true)
+                {
+                    double ellapsedSecs = DateTime.Now.Subtract(startTime).TotalSeconds;
+
+                    if (game.turn == game.myPiece)
+                    {
+                        game.myTime = myStartTime - ellapsedSecs;
+                    }
+                    else
+                    {
+                        game.opponentTime = opponentStartTime - ellapsedSecs;
+                    }
+
+                    UpdateTimeLabel();
+                    Thread.Sleep(100);
+                }
+            }
         }
 
         public void Disconnected()
@@ -497,25 +543,13 @@ namespace OthelloSharp
 
         public string PlayerName(int piece)
         {
-            if (piece == MyPiece)
+            if (piece == game.myPiece)
             {
                 return "당신";
             }
             else
             {
                 return "상대";
-            }
-        }
-
-        public int InvertPiece(int piece)
-        {
-            if (piece == Piece.Black)
-            {
-                return Piece.White;
-            }
-            else
-            {
-                return Piece.Black;
             }
         }
     }

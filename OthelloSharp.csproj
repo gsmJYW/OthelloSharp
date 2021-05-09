@@ -58,6 +58,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="src\Client.cs" />
+    <Compile Include="src\Game.cs" />
     <Compile Include="src\Server.cs" />
     <Page Include="src\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
