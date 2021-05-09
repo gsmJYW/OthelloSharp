@@ -12,12 +12,15 @@ namespace OthelloSharp
 {
     public partial class MainWindow : Window
     {
-        static class Constants
+        static class Piece
         {
             public const int Empty = 0;
-            public const int White = 1;
-            public const int Black = 2;
+            public const int Black = 1;
+            public const int White = 2;
         }
+
+        int MyPiece = 0;
+        int OpponentPiece = 0;
 
         Thread CreateGameThread, JoinGameThread;
         Server Server;
@@ -281,20 +284,6 @@ namespace OthelloSharp
             }
         }
 
-        public void Recieved(string msg)
-        {
-            string[] msgSplit = msg.Split();
-            string request = msgSplit[0];
-
-            switch (request)
-            {
-                case "chat":
-                    string content = string.Join("", msgSplit.Skip(1).ToArray());
-                    TextBoxWriteLine(ChatTextBox, "<상대> {0}", content);
-                    break;
-            }
-        }
-
         public void Sent(string msg)
         {
             string[] msgSplit = msg.Split();
@@ -307,8 +296,33 @@ namespace OthelloSharp
                     string content = string.Join("", msgSplit.Skip(1).ToArray());
                     TextBoxWriteLine(ChatTextBox, "<나> {0}", content);
                     break;
+
+                case "piece":
+                    MyPiece = Convert.ToInt32(msgSplit[1]);
+                    OpponentPiece = InvertPiece(MyPiece);
+                    break;
             }
         }
+
+        public void Recieved(string msg)
+        {
+            string[] msgSplit = msg.Split();
+            string request = msgSplit[0];
+
+            switch (request)
+            {
+                case "chat":
+                    string content = string.Join("", msgSplit.Skip(1).ToArray());
+                    TextBoxWriteLine(ChatTextBox, "<상대> {0}", content);
+                    break;
+
+                case "piece":
+                    MyPiece = Convert.ToInt32(msgSplit[2]);
+                    OpponentPiece = InvertPiece(MyPiece);
+                    break;
+            }
+        }
+
         private void ChatInputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (ChatInputTextBox.Text.Length > 0 && e.Key == Key.Return)
@@ -316,16 +330,6 @@ namespace OthelloSharp
                 Send("chat {0}", ChatInputTextBox.Text);
                 ChatInputTextBox.Clear();
             }
-        }
-
-        private void Connected()
-        {
-            Dispatcher.Invoke(new Action(() =>
-            {
-                ConsoleTextBox.Document.Blocks.Clear();
-                ChatTextBox.IsEnabled = true;
-                ChatInputTextBox.IsEnabled = true;
-            }));
         }
 
         private void BoardGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -341,7 +345,7 @@ namespace OthelloSharp
             foreach (var rowDefinition in BoardGrid.RowDefinitions)
             {
                 accumulatedHeight += rowDefinition.ActualHeight;
-                
+
                 if (accumulatedHeight >= point.Y)
                 {
                     break;
@@ -363,9 +367,9 @@ namespace OthelloSharp
             }
         }
 
-        public void DrawPiece(int row, int col, int color)
+        public void DrawPiece(int row, int col, int piece)
         {
-            var piece = new Ellipse()
+            var pieceEllipse = new Ellipse()
             {
                 Height = 43,
                 Width = 43,
@@ -373,18 +377,79 @@ namespace OthelloSharp
                 Margin = new Thickness() { Top = 7 + 52 * row, Left = 7 + 52 * col }
             };
 
-            if (color == Constants.White)
+            if (piece == Piece.Black)
             {
-                piece.Fill = Brushes.White;
-                piece.Stroke = Brushes.Black;
+                pieceEllipse.Fill = Brushes.Black;
+                pieceEllipse.Stroke = Brushes.White;
             }
             else
             {
-                piece.Fill = Brushes.Black;
-                piece.Stroke = Brushes.White;
+                pieceEllipse.Fill = Brushes.White;
+                pieceEllipse.Stroke = Brushes.Black;
             }
 
-            BoardCanvas.Children.Add(piece);
+            BoardCanvas.Children.Add(pieceEllipse);
+        }
+
+        public void Connected()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ConsoleTextBox.Document.Blocks.Clear();
+
+                ChatTextBox.IsEnabled = true;
+                ChatInputTextBox.IsEnabled = true;
+            }));
+
+            if (Server != null)
+            {
+                if (new Random().Next(0, 2) == 0)
+                {
+                    Send("piece {0} {1}", Piece.Black, Piece.White);
+                }
+                else
+                {
+                    Send("piece {0} {1}", Piece.White, Piece.Black);
+                }
+            }
+
+            while (MyPiece == 0 || OpponentPiece == 0)
+            {
+
+            }
+
+            TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", PieceName(MyPiece));
+            TextBoxWriteLine(ConsoleTextBox, "{0} 차례로 시작합니다.", PlayerName(Piece.Black));
+
+            for (int sec = 5; sec > 0; sec--)
+            {
+                TextBoxWriteLine(ConsoleTextBox, sec.ToString());
+                Thread.Sleep(1000);
+            }
+
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ConsoleTextBox.Document.Blocks.Clear();
+
+                Menu.Visibility = Visibility.Hidden;
+                Result.Visibility = Visibility.Visible;
+                BoardCanvas.Visibility = Visibility.Visible;
+
+                if (MyPiece == Piece.Black)
+                {
+                    OpponentColorRectangle.Fill = Brushes.White;
+                    OpponentColorRectangle.Stroke = Brushes.Black;
+
+                    MyColorRectangle.Fill = Brushes.Black;
+                }
+                else
+                {
+                    MyColorRectangle.Fill = Brushes.White;
+                    MyColorRectangle.Stroke = Brushes.Black;
+
+                    OpponentColorRectangle.Fill = Brushes.Black;
+                }
+            }));
         }
 
         public void Disconnected()
@@ -396,6 +461,12 @@ namespace OthelloSharp
 
                 ChatTextBox.Document.Blocks.Clear();
                 ChatInputTextBox.Clear();
+
+                ConsoleTextBox.Document.Blocks.Clear();
+
+                Menu.Visibility = Visibility.Visible;
+                Result.Visibility = Visibility.Hidden;
+                BoardCanvas.Visibility = Visibility.Hidden;
             }));
 
             if (Server != null)
@@ -408,7 +479,44 @@ namespace OthelloSharp
                 Client.Close();
                 Client = null;
             }
-            MessageBox.Show("연결이 끊겼습니다", "Othello#");
+
+            MessageBox.Show("상대와의 연결이 끊겼습니다", "Othello#");
+        }
+
+        public string PieceName(int piece)
+        {
+            if (piece == Piece.Black)
+            {
+                return "흑";
+            }
+            else
+            {
+                return "백";
+            }
+        }
+
+        public string PlayerName(int piece)
+        {
+            if (piece == MyPiece)
+            {
+                return "당신";
+            }
+            else
+            {
+                return "상대";
+            }
+        }
+
+        public int InvertPiece(int piece)
+        {
+            if (piece == Piece.Black)
+            {
+                return Piece.White;
+            }
+            else
+            {
+                return Piece.Black;
+            }
         }
     }
 }

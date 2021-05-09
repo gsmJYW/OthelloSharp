@@ -19,10 +19,10 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Grid x:Name="ControlBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControlBar_MouseLeftButtonDown">
+        <Grid x:Name="ControlBar" Background="#2A2E4D" Grid.ColumnSpan="2" MouseLeftButtonDown="ControlBar_MouseLeftButtonDown" Height="36" VerticalAlignment="Top">
             <Ellipse x:Name="CloseButton" Fill="Red" HorizontalAlignment="Left" Height="16" Margin="826,12,0,0" VerticalAlignment="Top" Width="16" MouseLeftButtonDown="CloseButton_MouseLeftButtonDown" RenderTransformOrigin="0.835,1.186"/>
             <Ellipse x:Name="MinimizeButton" Fill="#FFFFE100" HorizontalAlignment="Left" Height="16" Margin="800,12,0,0" VerticalAlignment="Top" Width="16" RenderTransformOrigin="-1.053,0.632" MouseLeftButtonDown="MinimizeButton_MouseLeftButtonDown"/>
-            <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,4,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
+            <Label x:Name="Title" Content="Othello#" HorizontalAlignment="Left" Margin="54,2,0,0" VerticalAlignment="Top" Foreground="White" FontFamily="NanumBarunGothic" FontSize="21"/>
         </Grid>
         <RichTextBox x:Name="ChatTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="364" Margin="215,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="201" IsReadOnly="True" Style="{x:Null}" FontSize="12" IsEnabled="False">
             <FlowDocument/>
@@ -38,6 +38,12 @@
                 <RowDefinition Height="292*"/>
                 <RowDefinition Height="94*"/>
             </Grid.RowDefinitions>
+            <Grid x:Name="MenuIcon" RenderTransformOrigin="0.678,-2.51" Margin="10,10,10,12" Grid.RowSpan="3">
+                <Image x:Name="ServerIcon" Source="/OthelloSharp;component/assets/server.png" Margin="26,20,26,378" RenderTransformOrigin="1.6,4.65"/>
+                <Image x:Name="ClientIcon" Source="/OthelloSharp;component/assets/client.png" Margin="26,85,26,313" RenderTransformOrigin="1.6,4.65"/>
+                <Image x:Name="HelpIcon" Source="/OthelloSharp;component/assets/help.png" Margin="26,149,26,249" RenderTransformOrigin="1.6,4.65"/>
+                <Image x:Name="CancelIcon" Source="/OthelloSharp;component/assets/cancel.png" Margin="26,379,26,19" RenderTransformOrigin="1.6,4.65" Opacity="0.5"/>
+            </Grid>
             <StackPanel x:Name="MenuLabelPanel" HorizontalAlignment="Left" Height="406" Margin="10,26,0,0" VerticalAlignment="Top" Width="180" Grid.RowSpan="3" Grid.ColumnSpan="2">
                 <Label x:Name="ServerLabel" Content="게임 생성" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.226,0" Height="64" Width="110"/>
                 <Label x:Name="ClientLabel" Content="게임 참여" FontSize="20" HorizontalAlignment="Center" FontFamily="NanumBarunGothic" Foreground="Black" Margin="70,0,0.226,0" Height="64" Width="110"/>
@@ -53,18 +59,11 @@
                 <Rectangle x:Name="CancelButton" Fill="Black" Height="64" Stroke="Black" Margin="0,0,0.226,0" Opacity="0" MouseEnter="MenuButton_MouseEnter" MouseLeave="MenuButton_MouseLeave" IsEnabled="False" MouseLeftButtonDown="CancelButton_MouseLeftButtonDown"/>
             </StackPanel>
         </Grid>
-        <Grid x:Name="MenuIcon" RenderTransformOrigin="0.678,-2.51" Margin="10,10,343,12" Grid.Row="1">
-            <Image x:Name="ServerIcon" Source="/OthelloSharp;component/assets/server.png" Margin="26,20,26,378" RenderTransformOrigin="1.6,4.65"/>
-            <Image x:Name="ClientIcon" Source="/OthelloSharp;component/assets/client.png" Margin="26,85,26,313" RenderTransformOrigin="1.6,4.65"/>
-            <Image x:Name="HelpIcon" Source="/OthelloSharp;component/assets/help.png" Margin="26,149,26,249" RenderTransformOrigin="1.6,4.65"/>
-            <Image x:Name="CancelIcon" Source="/OthelloSharp;component/assets/cancel.png" Margin="26,379,26,19" RenderTransformOrigin="1.6,4.65" Opacity="0.5"/>
-        </Grid>
         <RichTextBox x:Name="ConsoleTextBox" HorizontalAlignment="Left" Height="422" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="422" Grid.ColumnSpan="2" FontSize="16" IsReadOnly="True">
             <FlowDocument>
                 <Paragraph/>
             </FlowDocument>
         </RichTextBox>
-        <Border x:Name="BoardBorder" BorderBrush="Black" BorderThickness="3" HorizontalAlignment="Left" Height="422" VerticalAlignment="Top" Width="422" RenderTransformOrigin="0.865,0.744" Margin="210,10,0,0" Grid.Row="1" Grid.ColumnSpan="2" d:IsHidden="True"/>
         <Canvas x:Name="BoardCanvas" HorizontalAlignment="Left" Height="422" Margin="210,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="422" Grid.ColumnSpan="2" Background="Black" Visibility="Hidden">
             <Grid x:Name="BoardGrid" Background="#FF00A000" ShowGridLines="True" MouseLeftButtonDown="BoardGrid_MouseLeftButtonDown" Height="416" Canvas.Left="3" Canvas.Top="3" Width="416">
                 <Grid.RowDefinitions>
@@ -89,5 +88,37 @@
                 </Grid.ColumnDefinitions>
             </Grid>
         </Canvas>
+        <Grid x:Name="Result" HorizontalAlignment="Left" Height="422" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="190" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="39*"/>
+                <RowDefinition Height="383*"/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="MyResult" HorizontalAlignment="Left" Height="421" VerticalAlignment="Top" Width="190" Grid.RowSpan="2" Margin="0,1,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="137*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox x:Name="MyGroupBox" Header="나" Height="110" VerticalAlignment="Top" Margin="0,-10,0,0" Grid.ColumnSpan="2"/>
+                <Label x:Name="MyColorLabel" Content="색" HorizontalAlignment="Left" Margin="26,10,0,386" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Rectangle x:Name="MyColorRectangle" Fill="White" HorizontalAlignment="Left" Height="20" Margin="65,14,0,0" Stroke="Black" VerticalAlignment="Top" Width="48"/>
+                <Label x:Name="MyPieceLabel" Content="돌" HorizontalAlignment="Left" Margin="26,36,0,360" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="MyPieceCountLabel" Content="66" HorizontalAlignment="Left" Margin="62,36,0,360" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="MyTimeLabel" Content="시간" HorizontalAlignment="Left" Margin="26,62,0,334" Width="36" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="MyTimeSecondLabel" Content="666.6초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
+            </Grid>
+            <Grid x:Name="OpponentResult" HorizontalAlignment="Left" Height="311" VerticalAlignment="Top" Width="190" Margin="0,72,0,0" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="137*"/>
+                    <ColumnDefinition Width="53*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox x:Name="OpponentGroupBox" Header="상대" Height="110" VerticalAlignment="Top" Margin="0,-10,0,0" Grid.ColumnSpan="2"/>
+                <Label x:Name="OpponentColorLabel" Content="색" HorizontalAlignment="Left" Margin="26,10,0,277" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Rectangle x:Name="OpponentColorRectangle" Fill="White" HorizontalAlignment="Left" Height="20" Margin="65,14,0,0" Stroke="Black" VerticalAlignment="Top" Width="48"/>
+                <Label x:Name="OpponentPieceLabel" Content="돌" HorizontalAlignment="Left" Margin="26,36,0,251" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="OpponentPieceCountLabel" Content="66" HorizontalAlignment="Left" Margin="62,36,0,249" Width="24" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="OpponentTimeLabel" Content="시간" HorizontalAlignment="Left" Margin="26,62,0,225" Width="36" RenderTransformOrigin="0.833,1"/>
+                <Label x:Name="OpponentTimeSecondLabel" Content="666.6초" HorizontalAlignment="Left" Margin="62,62,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
