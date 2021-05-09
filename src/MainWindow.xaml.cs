@@ -52,28 +52,7 @@ namespace OthelloSharp
 
         private void ServerButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ushort port;
-            string portInput = Interaction.InputBox("포트 번호를 입력하세요.\n(0 ~ 65535)", "Othello#");
-
-            while (true)
-            {
-                try
-                {
-                    if (portInput.Length == 0)
-                    {
-                        return;
-                    }
-
-                    port = Convert.ToUInt16(portInput);
-                }
-                catch
-                {
-                    portInput = Interaction.InputBox("잘못된 포트 번호입니다.\n포트 번호를 다시 입력하세요.\n(0 ~ 65535)", "Othello#");
-                    continue;
-                }
-
-                break;
-            }
+            ushort port = 727;
 
             CreateGameThread = new Thread(() => CreateGame(port))
             {
@@ -85,34 +64,12 @@ namespace OthelloSharp
 
         private void ClientButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ushort port;
+            ushort port = 727;
             string serverAddress = Interaction.InputBox("서버 주소를 입력하세요.", "Othello#");
 
             if (serverAddress.Length == 0)
             {
                 return;
-            }
-
-            string portInput = Interaction.InputBox("포트 번호를 입력하세요.\n(0 ~ 65535)", "Othello#");
-
-            while (true)
-            {
-                try
-                {
-                    if (portInput.Length == 0)
-                    {
-                        return;
-                    }
-
-                    port = Convert.ToUInt16(portInput);
-                }
-                catch
-                {
-                    portInput = Interaction.InputBox("잘못된 포트 번호입니다.\n포트 번호를 다시 입력하세요.\n(0 ~ 65535)", "Othello#");
-                    continue;
-                }
-
-                break;
             }
 
             JoinGameThread = new Thread(() => JoinGame(serverAddress, port))
@@ -138,39 +95,26 @@ namespace OthelloSharp
         private void CancelButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             TextBoxWriteLine(ConsoleTextBox, "연결 취소.");
-
-            if (CreateGameThread != null && CreateGameThread.IsAlive)
-            {
-                Server.Close();
-                Server = null;
-            }
-
-            if (JoinGameThread != null && JoinGameThread.IsAlive)
-            {
-                Client.Close();
-                Client = null;
-            }
-
             DisableCancelButton();
+            CloseConnection();
         }
 
         private void CreateGame(ushort port)
         {
             Server = new Server(this);
 
-            TextBoxWriteLine(ConsoleTextBox, "{0} 포트에서 게임 생성 중...", port);
+            TextBoxWriteLine(ConsoleTextBox, "게임 생성 중...");
             EnableCancelButton();
 
             try
             {
                 Server.Open(port);
             }
-            catch
+            catch (Exception e)
             {
-                Server = null;
-
-                TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
+                TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
                 DisableCancelButton();
+                CloseConnection();
                 return;
             }
 
@@ -197,7 +141,7 @@ namespace OthelloSharp
         {
             Client = new Client(this);
 
-            TextBoxWriteLine(ConsoleTextBox, "{0}:{1}(으)로 연결을 시도하는 중...", serverAddress, port);
+            TextBoxWriteLine(ConsoleTextBox, "{0}(으)로 연결을 시도하는 중...", serverAddress);
             EnableCancelButton();
 
             try
@@ -206,10 +150,16 @@ namespace OthelloSharp
             }
             catch (Exception e)
             {
-                TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
-                DisableCancelButton();
+                if (Client != null)
+                {
+                    TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
+                    DisableCancelButton();
+                    CloseConnection();
+                }
+
                 return;
             }
+
             Connected();
         }
 
@@ -421,15 +371,8 @@ namespace OthelloSharp
 
             while (game.myPiece == 0 || game.opponentPiece == 0)
             {
-                if (Server != null && !Server.IsClientConnected() || Client != null && !Client.IsServerConnected())
+                if (Server == null && Client == null)
                 {
-                    Dispatcher.Invoke(new Action(() =>
-                    {
-                        ChatTextBox.IsEnabled = false;
-                        ChatInputTextBox.IsEnabled = false;
-                    }));
-
-                    TextBoxWriteLine(ConsoleTextBox, "연결 실패.");
                     return;
                 }
             }
@@ -513,7 +456,7 @@ namespace OthelloSharp
 
         public void Disconnected()
         {
-            EnableCancelButton();
+            DisableCancelButton();
 
             Dispatcher.Invoke(new Action(() =>
             {
@@ -528,18 +471,23 @@ namespace OthelloSharp
                 BoardCanvas.Visibility = Visibility.Hidden;
             }));
 
+            CloseConnection();
+            MessageBox.Show("상대와의 연결이 끊겼습니다", "Othello#");
+        }
+
+        public void CloseConnection()
+        {
             if (Server != null)
             {
                 Server.Close();
                 Server = null;
             }
-            else if (Client != null)
+
+            if (Client != null)
             {
                 Client.Close();
                 Client = null;
             }
-
-            MessageBox.Show("상대와의 연결이 끊겼습니다", "Othello#");
         }
 
         public string PieceName(int piece)
