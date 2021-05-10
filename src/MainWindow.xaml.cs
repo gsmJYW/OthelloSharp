@@ -20,7 +20,7 @@ namespace OthelloSharp
         Server Server;
         Client Client;
 
-        bool IsPiecePlaced;
+        bool IsPiecePlaced, MyTimeout, OpponentTimeout, GameOver;
 
         public MainWindow()
         {
@@ -98,7 +98,7 @@ namespace OthelloSharp
         {
             TextBoxWriteLine(ConsoleTextBox, "연결 취소.");
             DisableCancelButton();
-            CloseConnection();
+            Disconnect();
         }
 
         private void CreateGame(ushort port)
@@ -116,7 +116,7 @@ namespace OthelloSharp
             {
                 TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
                 DisableCancelButton();
-                CloseConnection();
+                Disconnect();
                 return;
             }
 
@@ -156,7 +156,7 @@ namespace OthelloSharp
                 {
                     TextBoxWriteLine(ConsoleTextBox, "{0}.", e.Message);
                     DisableCancelButton();
-                    CloseConnection();
+                    Disconnect();
                 }
 
                 return;
@@ -231,12 +231,16 @@ namespace OthelloSharp
             switch (request)
             {
                 case "chat":
-                    string content = string.Join("", msgSplit.Skip(1).ToArray());
+                    string content = string.Join(" ", msgSplit.Skip(1).ToArray());
                     TextBoxWriteLine(ChatTextBox, "<나> {0}", content);
                     break;
 
                 case "piece":
                     game.SetPiece(Convert.ToInt32(msgSplit[1]));
+                    break;
+
+                case "timeout":
+                    MyTimeout = true;
                     break;
             }
         }
@@ -249,7 +253,7 @@ namespace OthelloSharp
             switch (request)
             {
                 case "chat":
-                    string content = string.Join("", msgSplit.Skip(1).ToArray());
+                    string content = string.Join(" ", msgSplit.Skip(1).ToArray());
                     TextBoxWriteLine(ChatTextBox, "<상대> {0}", content);
                     break;
 
@@ -261,6 +265,10 @@ namespace OthelloSharp
                     game.PlacePiece(game.opponentPiece, Convert.ToInt32(msgSplit[1]), Convert.ToInt32(msgSplit[2]));
                     game.opponentTime = Convert.ToDouble(msgSplit[3]);
                     IsPiecePlaced = true;
+                    break;
+
+                case "timeout":
+                    OpponentTimeout = true;
                     break;
             }
         }
@@ -355,12 +363,42 @@ namespace OthelloSharp
             }
         }
 
+        public void UpdateGroupBoxBorder()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                if (game.turn == game.myPiece)
+                {
+                    MyGroupBox.BorderBrush = Brushes.Red;
+                    OpponentGroupBox.BorderBrush = Brushes.LightGray;
+                }
+                else if (game.turn == game.opponentPiece)
+                {
+                    OpponentGroupBox.BorderBrush = Brushes.Red;
+                    MyGroupBox.BorderBrush = Brushes.LightGray;
+                }
+                else
+                {
+                    MyGroupBox.BorderBrush = Brushes.LightGray;
+                    OpponentGroupBox.BorderBrush = Brushes.LightGray;
+                }
+            }));
+        }
+
         public void UpdateTimeLabel()
         {
             Dispatcher.Invoke(new Action(() =>
             {
                 MyTimeSecondLabel.Content = string.Format("{0:000.0}", game.myTime);
                 OpponentTimeSecondLabel.Content = string.Format("{0:000.0}", game.opponentTime);
+            }));
+        }
+
+        public void UpdateLogLabel(string log)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                LogLabel.Content = log;
             }));
         }
 
@@ -421,8 +459,8 @@ namespace OthelloSharp
                 ConsoleTextBox.Document.Blocks.Clear();
             }));
 
-            TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", PieceName(game.myPiece));
-            TextBoxWriteLine(ConsoleTextBox, "{0} 차례로 시작합니다.", PlayerName(Piece.Black));
+            TextBoxWriteLine(ConsoleTextBox, "당신의 색은 {0}입니다.", Piece.Black == game.myPiece ? "흑" : "백");
+            TextBoxWriteLine(ConsoleTextBox, "{0} 차례로 시작합니다.", Piece.Black == game.myPiece ? "당신" : "상대");
 
             for (int sec = 4; sec > 0; sec--)
             {
@@ -473,13 +511,21 @@ namespace OthelloSharp
 
             while (true)
             {
+                UpdateGroupBoxBorder();
+
                 DateTime startTime = DateTime.Now;
 
                 double myStartTime = game.myTime;
                 double opponentStartTime = game.opponentTime;
 
-                while (!IsPiecePlaced)
+                while (!IsPiecePlaced && !OpponentTimeout)
                 {
+                    if (game.myTime <= 0)
+                    {
+                        Send("timeout");
+                        break;
+                    }
+
                     double ellapsedSecs = DateTime.Now.Subtract(startTime).TotalSeconds;
 
                     if (game.turn == game.myPiece)
@@ -499,7 +545,25 @@ namespace OthelloSharp
                 UpdatePieceCountLabel();
                 IsPiecePlaced = false;
 
-                if (game.turn == game.myPiece)
+                if (MyTimeout || OpponentTimeout)
+                {
+                    break;
+                }
+                else if (!game.HasAvailablePlace(game.myPiece) && !game.HasAvailablePlace(game.opponentPiece))
+                {
+                    break;
+                }
+                else if (game.turn == game.opponentPiece && !game.HasAvailablePlace(game.myPiece))
+                {
+                    UpdateLogLabel("당신이 돌을 놓을 수 없어\n상대 차례입니다.");
+                    continue;
+                }
+                else if (game.turn == game.myPiece && !game.HasAvailablePlace(game.opponentPiece))
+                {
+                    UpdateLogLabel("상대가 돌을 놓을 수 없어\n당신 차례입니다.");
+                    continue;
+                }
+                else if (game.turn == game.myPiece)
                 {
                     game.turn = game.opponentPiece;
                 }
@@ -507,7 +571,40 @@ namespace OthelloSharp
                 {
                     game.turn = game.myPiece;
                 }
+                UpdateLogLabel("");
             }
+
+            game.turn = 0;
+            GameOver = true;
+            UpdateGroupBoxBorder();
+            UpdateLogLabel("");
+
+            if (MyTimeout)
+            {
+                MessageBox.Show("시간을 전부 사용하셨습니다.\n상대의 승리입니다.", "Othello#");
+                MyTimeout = false;
+            }
+            else if (OpponentTimeout)
+            {
+                MessageBox.Show("상대가 시간을 전부 사용했습니다.\n당신의 승리입니다.", "Othello#");
+                OpponentTimeout = false;
+            }
+            else
+            {
+                int myPieceCount = game.CountPiece(game.myPiece);
+                int opponentPieceCount = game.CountPiece(game.opponentPiece);
+
+                if (myPieceCount == opponentPieceCount)
+                {
+                    MessageBox.Show(string.Format("돌 개수가 같습니다.\n무승부입니다.", myPieceCount - opponentPieceCount), "Othello#");
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("{0}의 돌이 {1}개 더 많습니다.\n{0}의 승리입니다.", myPieceCount > opponentPieceCount ? "당신" : "상대", Math.Abs(myPieceCount - opponentPieceCount)), "Othello#");
+                }
+            }
+
+            Disconnect();
         }
 
         public void Disconnected()
@@ -516,9 +613,14 @@ namespace OthelloSharp
 
             Dispatcher.Invoke(new Action(() =>
             {
+                MenuButtonPanel.IsEnabled = true;
+                MenuLabelPanel.Opacity = 1;
+                MenuIcon.Opacity = 1;
+
                 ChatTextBox.IsEnabled = false;
                 ChatInputTextBox.IsEnabled = false;
 
+                ConsoleTextBox.Document.Blocks.Clear();
                 ChatTextBox.Document.Blocks.Clear();
                 ChatInputTextBox.Clear();
 
@@ -527,11 +629,27 @@ namespace OthelloSharp
                 BoardCanvas.Visibility = Visibility.Hidden;
             }));
 
-            CloseConnection();
-            MessageBox.Show("상대와의 연결이 끊겼습니다", "Othello#");
+            if (CreateGameThread != null && CreateGameThread.IsAlive)
+            {
+                CreateGameThread.Interrupt();
+            }
+            else if (JoinGameThread != null && JoinGameThread.IsAlive)
+            {
+                JoinGameThread.Interrupt();
+            }
+
+            if (GameOver)
+            {
+                GameOver = false;
+            }
+            else
+            {
+                MessageBox.Show("상대와의 연결이 끊겼습니다", "Othello#");
+                Disconnect();
+            }
         }
 
-        public void CloseConnection()
+        public void Disconnect()
         {
             if (Server != null)
             {
@@ -555,18 +673,6 @@ namespace OthelloSharp
             else
             {
                 return "백";
-            }
-        }
-
-        public string PlayerName(int piece)
-        {
-            if (piece == game.myPiece)
-            {
-                return "당신";
-            }
-            else
-            {
-                return "상대";
             }
         }
     }
