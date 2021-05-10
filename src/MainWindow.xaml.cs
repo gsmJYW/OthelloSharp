@@ -20,7 +20,7 @@ namespace OthelloSharp
         Server Server;
         Client Client;
 
-        bool IsPiecePlaced, MyTimeout, OpponentTimeout, GameOver;
+        bool IsPiecePlaced, MyTimeout, OpponentTimeout, MyResign, OpponentResign, GameOver;
 
         public MainWindow()
         {
@@ -242,6 +242,10 @@ namespace OthelloSharp
                 case "timeout":
                     MyTimeout = true;
                     break;
+
+                case "resign":
+                    MyResign = true;
+                    break;
             }
         }
 
@@ -269,6 +273,10 @@ namespace OthelloSharp
 
                 case "timeout":
                     OpponentTimeout = true;
+                    break;
+
+                case "resign":
+                    OpponentResign = true;
                     break;
             }
         }
@@ -411,6 +419,11 @@ namespace OthelloSharp
             }));
         }
 
+        private void ResignButton_Click(object sender, RoutedEventArgs e)
+        {
+            Send("resign");
+        }
+
         public void Connected()
         {
             Dispatcher.Invoke(new Action(() =>
@@ -518,11 +531,15 @@ namespace OthelloSharp
                 double myStartTime = game.myTime;
                 double opponentStartTime = game.opponentTime;
 
-                while (!IsPiecePlaced && !OpponentTimeout)
+                while (!IsPiecePlaced)
                 {
                     if (game.myTime <= 0)
                     {
                         Send("timeout");
+                    }
+
+                    if (MyTimeout || OpponentTimeout || MyResign || OpponentResign)
+                    {
                         break;
                     }
 
@@ -545,7 +562,7 @@ namespace OthelloSharp
                 UpdatePieceCountLabel();
                 IsPiecePlaced = false;
 
-                if (MyTimeout || OpponentTimeout)
+                if (MyTimeout || OpponentTimeout || MyResign || OpponentResign)
                 {
                     break;
                 }
@@ -588,6 +605,16 @@ namespace OthelloSharp
             {
                 MessageBox.Show("상대가 시간을 전부 사용했습니다.\n당신의 승리입니다.", "Othello#");
                 OpponentTimeout = false;
+            }
+            else if (MyResign)
+            {
+                MessageBox.Show("물러나셨습니다.\n상대의 승리입니다.", "Othello#");
+                MyResign = false;
+            }
+            else if (OpponentResign)
+            {
+                MessageBox.Show("상대가 물러났습니다.\n당신의 승리입니다.", "Othello#");
+                OpponentResign = false;
             }
             else
             {
