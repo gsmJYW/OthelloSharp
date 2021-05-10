@@ -58,7 +58,14 @@ namespace OthelloSharp
 			ao.Buffer = Encoding.Unicode.GetBytes(string.Format(format, args));
 			ao.WorkingSocket = ConnectedClient;
 
-			ConnectedClient.BeginSend(ao.Buffer, 0, ao.Buffer.Length, SocketFlags.None, SendHandler, ao);
+			try
+			{
+				ConnectedClient.BeginSend(ao.Buffer, 0, ao.Buffer.Length, SocketFlags.None, SendHandler, ao);
+			}
+			catch
+            {
+				mainWindow.Disconnected();
+            }
 		}
 
 		private void HandleClientConnectionRequest(IAsyncResult ar)
