@@ -83,11 +83,11 @@ namespace OthelloSharp.src
 
 		public bool HasAvailablePlace(int piece)
 		{
-			for (int y = 0; y < 8; y++)
+			for (int row = 0; row < 8; row++)
 			{
-				for (int x = 0; x < 8; x++)
+				for (int col = 0; col < 8; col++)
 				{
-					if (IsAvailable(piece, x, y))
+					if (IsAvailable(piece, row, col))
 					{
 						return true;
 					}
