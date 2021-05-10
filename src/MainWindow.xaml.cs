@@ -364,6 +364,15 @@ namespace OthelloSharp
             }));
         }
 
+        public void UpdatePieceCountLabel()
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                MyPieceCountLabel.Content = string.Format("{0:00}", game.CountPiece(game.myPiece));
+                OpponentPieceCountLabel.Content = string.Format("{0:00}", game.CountPiece(game.opponentPiece));
+            }));
+        }
+
         public void Connected()
         {
             Dispatcher.Invoke(new Action(() =>
@@ -487,6 +496,7 @@ namespace OthelloSharp
                 }
 
                 DrawPiece(game.board);
+                UpdatePieceCountLabel();
                 IsPiecePlaced = false;
 
                 if (game.turn == game.myPiece)

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace OthelloSharp.src
 {
@@ -152,6 +148,11 @@ namespace OthelloSharp.src
                     }
 				}
 			}
+		}
+
+		public int CountPiece(int piece)
+		{
+			return board.Cast<int>().Count(value => value == piece);
 		}
 
 		public static int Opponent(int piece)
