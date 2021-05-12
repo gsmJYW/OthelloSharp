@@ -572,12 +572,12 @@ namespace OthelloSharp
                 }
                 else if (game.turn == game.opponentPiece && !game.HasAvailablePlace(game.myPiece))
                 {
-                    UpdateLogLabel("당신이 돌을 놓을 수 없어\n상대 차례입니다.");
+                    UpdateLogLabel("당신이 돌을 놓을 수\n없어 상대 차례입니다.");
                     continue;
                 }
                 else if (game.turn == game.myPiece && !game.HasAvailablePlace(game.opponentPiece))
                 {
-                    UpdateLogLabel("상대가 돌을 놓을 수 없어\n당신 차례입니다.");
+                    UpdateLogLabel("상대가 돌을 놓을 수\n없어 당신 차례입니다.");
                     continue;
                 }
                 else if (game.turn == game.myPiece)

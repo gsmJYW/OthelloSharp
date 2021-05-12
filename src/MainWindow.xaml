@@ -93,7 +93,7 @@
                 <RowDefinition Height="39*"/>
                 <RowDefinition Height="383*"/>
             </Grid.RowDefinitions>
-            <Label x:Name="LogLabel" Content="" HorizontalAlignment="Left" Margin="0,170.057,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-1.606,-0.215" Height="213" Width="190"/>
+            <Label x:Name="LogLabel" Content="" HorizontalAlignment="Left" Margin="0,170.057,0,0" Grid.Row="1" VerticalAlignment="Top" RenderTransformOrigin="-1.606,-0.215" Height="213" Width="121"/>
             <Button x:Name="ResignButton" Content="물러나기" HorizontalAlignment="Left" Margin="126,178.057,0,0" Grid.Row="1" VerticalAlignment="Top" Width="64" RenderTransformOrigin="0.504,-0.374" Height="24" Click="ResignButton_Click"/>
             <Grid x:Name="MyResult" HorizontalAlignment="Left" Height="421" VerticalAlignment="Top" Width="190" Grid.RowSpan="2" Margin="0,1,0,0">
                 <Grid.ColumnDefinitions>
